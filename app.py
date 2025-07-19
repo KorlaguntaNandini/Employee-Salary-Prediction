@@ -1,59 +1,57 @@
-import streamlit as st
 import pandas as pd
+import numpy as np
+import streamlit as st
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score
 
-# Streamlit UI
-st.title("Employee Salary Prediction App")
+# App Title
+st.title("🔍 Employee Salary Prediction using Machine Learning")
 
-# Automatically load the CSV that is already in the repo
+# Load dataset automatically (no upload)
 df = pd.read_csv("employee_data.csv")
-st.success("✅ Dataset loaded successfully from repository.")
+st.success("✅ Dataset loaded successfully from the repository.")
 
-    st.write("### Data Preview", data.head())
+# Show data preview
+st.write("### Data Preview")
+st.write(df.head())
 
-    # Feature and target selection
-    st.write("### Select Features (Independent variables):")
-    selected_features = st.multiselect("Choose columns for features (X):", data.columns.tolist())
+# Drop missing values
+df.dropna(inplace=True)
 
-    st.write("### Select Target (Dependent variable):")
-    selected_target = st.selectbox("Choose column for target (y):", data.columns.tolist())
+# Encode categorical columns
+le = LabelEncoder()
+for col in df.columns:
+    if df[col].dtype == 'object':
+        df[col] = le.fit_transform(df[col])
 
-    if selected_features and selected_target:
-        X = data[selected_features]
-        y = data[selected_target]
-        if st.button("Train Model"):
-            # Step 1: Split the data
-            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+# Feature selection
+st.write("### Select Features (Independent Variables):")
+features = st.multiselect("Choose features (X):", options=df.columns)
 
-            # Step 2: Create the model
-            model = LogisticRegression()
+# Target selection
+st.write("### Select Target (Dependent Variable):")
+target = st.selectbox("Choose target (y):", options=df.columns)
 
-            # Step 3: Train the model
-            model.fit(X_train, y_train)
+# Model training after selections
+if features and target:
+    X = df[features]
+    y = df[target]
 
-            # Step 4: Make predictions
-            y_pred = model.predict(X_test)
+    # Split the dataset
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.2, random_state=42
+    )
 
-            # Step 5: Show accuracy
-            accuracy = accuracy_score(y_test, y_pred)
-            st.success(f"✅ Model Trained Successfully!\n\nAccuracy: {accuracy * 100:.2f}%")
+    # Train the model
+    model = LogisticRegression()
+    model.fit(X_train, y_train)
 
-        # Encode target labels
-        le = LabelEncoder()
-        y = le.fit_transform(y)
+    # Predict and evaluate
+    y_pred = model.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
 
-        # Split data
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-        # Train model
-        model = LogisticRegression()
-        model.fit(X_train, y_train)
-
-        # Predict and show accuracy
-        y_pred = model.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-
-        st.success(f"Model Accuracy: {accuracy:.2f}")
+    # Display results
+    st.success(f"✅ Model Trained Automatically!")
+    st.write(f"**Accuracy:** {accuracy * 100:.2f}%")

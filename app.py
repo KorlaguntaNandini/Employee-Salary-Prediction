@@ -8,10 +8,10 @@ from sklearn.metrics import accuracy_score
 # Streamlit UI
 st.title("Employee Salary Prediction App")
 
-uploaded_file = st.file_uploader("Upload CSV File", type=["csv"])
+# Automatically load the CSV that is already in the repo
+df = pd.read_csv("employee_data.csv")
+st.success("✅ Dataset loaded successfully from repository.")
 
-if uploaded_file is not None:
-    data = pd.read_csv(uploaded_file)
     st.write("### Data Preview", data.head())
 
     # Feature and target selection

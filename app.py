@@ -24,6 +24,22 @@ if uploaded_file is not None:
     if selected_features and selected_target:
         X = data[selected_features]
         y = data[selected_target]
+        if st.button("Train Model"):
+            # Step 1: Split the data
+            X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+            # Step 2: Create the model
+            model = LogisticRegression()
+
+            # Step 3: Train the model
+            model.fit(X_train, y_train)
+
+            # Step 4: Make predictions
+            y_pred = model.predict(X_test)
+
+            # Step 5: Show accuracy
+            accuracy = accuracy_score(y_test, y_pred)
+            st.success(f"✅ Model Trained Successfully!\n\nAccuracy: {accuracy * 100:.2f}%")
 
         # Encode target labels
         le = LabelEncoder()
